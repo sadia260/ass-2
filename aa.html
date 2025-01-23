@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drink Card Website</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            margin: 20px;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .drink-card {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Drink Card Website</h1>
+
+        <!-- Search Section -->
+        <div class="mb-4">
+            <input type="text" id="searchInput" class="form-control mb-2" placeholder="Search drinks...">
+            <button id="searchButton" class="btn btn-primary w-100">Search</button>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="row">
+            <!-- Left Column: Drink Cards -->
+            <div class="col-md-6" id="drinkCards">
+                <!-- Default Drink Cards will be populated here -->
+            </div>
+
+            <!-- Right Column: Add to Group Section -->
+            <div class="col-md-6">
+                <h4>Group Selected Drinks (<span id="drinkCount">0</span>/7)</h4>
+                <ul id="groupList" class="list-group"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Drink Details -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Drink Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <!-- Drink details will appear here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const drinks = [
+            { name: "Margarita", category: "Cocktail", instructions: "Mix and serve chilled.", id: 1 },
+            { name: "Mojito", category: "Cocktail", instructions: "Add mint leaves and soda.", id: 2 },
+            { name: "Martini", category: "Cocktail", instructions: "Stir and strain into glass.", id: 3 },
+            { name: "Old Fashioned", category: "Cocktail", instructions: "Add bitters and stir.", id: 4 },
+            { name: "Daiquiri", category: "Cocktail", instructions: "Shake and serve cold.", id: 5 },
+            { name: "Whiskey Sour", category: "Cocktail", instructions: "Shake with ice and strain.", id: 6 },
+            { name: "Cosmopolitan", category: "Cocktail", instructions: "Shake with cranberry juice.", id: 7 },
+            { name: "Bloody Mary", category: "Cocktail", instructions: "Add tomato juice and vodka.", id: 8 },
+        ];
+
+        const group = [];
+        
+        // Populate Default Drinks
+        function loadDrinks(drinksToShow) {
+            const drinkCards = document.getElementById('drinkCards');
+            drinkCards.innerHTML = '';
+            
+            drinksToShow.forEach(drink => {
+                const card = document.createElement('div');
+                card.className = 'card drink-card';
+                card.innerHTML = `
+                    <div class="card-body">
+                        <h5 class="card-title">${drink.name}</h5>
+                        <p class="card-text">Category: ${drink.category}</p>
+                        <p class="card-text">Instructions: ${drink.instructions.substring(0, 15)}...</p>
+                        <button class="btn btn-success me-2" onclick="addToGroup('${drink.name}')">Add to Group</button>
+                        <button class="btn btn-info" onclick="showDetails(${drink.id})">Details</button>
+                    </div>
+                `;
+                drinkCards.appendChild(card);
+            });
+        }
+
+        // Add to Group
+        function addToGroup(drinkName) {
+            if (group.length >= 7) {
+                alert('You can only add up to 7 drinks.');
+                return;
+            }
+
+            if (!group.includes(drinkName)) {
+                group.push(drinkName);
+                const groupList = document.getElementById('groupList');
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item';
+                listItem.textContent = drinkName;
+                groupList.appendChild(listItem);
+
+                document.getElementById('drinkCount').textContent = group.length;
+            }
+        }
+
+        // Show Details Modal
+        function showDetails(drinkId) {
+            const drink = drinks.find(d => d.id === drinkId);
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <p><strong>Name:</strong> ${drink.name}</p>
+                <p><strong>Category:</strong> ${drink.category}</p>
+                <p><strong>Instructions:</strong> ${drink.instructions}</p>
+                <p><strong>Ingredients:</strong> Example Ingredient 1, Example Ingredient 2</p>
+                <p><strong>Glass Type:</strong> Example Glass</p>
+            `;
+
+            const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+            modal.show();
+        }
+
+        // Search Functionality
+        document.getElementById('searchButton').addEventListener('click', () => {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const filteredDrinks = drinks.filter(drink => drink.name.toLowerCase().includes(searchInput));
+
+            if (filteredDrinks.length > 0) {
+                loadDrinks(filteredDrinks);
+            } else {
+                document.getElementById('drinkCards').innerHTML = '<p>No results found.</p>';
+            }
+        });
+
+        // Load default drinks on page load
+        loadDrinks(drinks);
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
